@@ -1,12 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Search, Filter, Heart, Scale, SlidersHorizontal, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function CarsPage() {
+  return (
+    <Suspense fallback={null}>
+      <CarsPageContent />
+    </Suspense>
+  );
+}
+
+function CarsPageContent() {
   const searchParams = useSearchParams();
   const [cars, setCars] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
