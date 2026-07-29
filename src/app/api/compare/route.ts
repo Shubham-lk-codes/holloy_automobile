@@ -33,16 +33,50 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// export async function DELETE(req: NextRequest) {
+//   const session = await getServerSession();
+//   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+//   const { searchParams } = new URL(req.url);
+//   const id = searchParams.get('id');
+
+//   await prisma.comparison.deleteMany({
+//     where: { id, userId: session.user.id },
+//   });
+
+//   return NextResponse.json({ success: true });
+// }
+
+
 export async function DELETE(req: NextRequest) {
   const session = await getServerSession();
-  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
 
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get('id');
+  const id = searchParams.get("id");
 
-  await prisma.comparison.deleteMany({
-    where: { id, userId: session.user.id },
+  if (!id) {
+    return NextResponse.json(
+      { error: "Wishlist item id is required" },
+      { status: 400 }
+    );
+  }
+
+  await prisma.wishlistItem.deleteMany({
+    where: {
+      id: id, // Now id is guaranteed to be a string (not null)
+      userId: session.user.id,
+    },
   });
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({
+    success: true,
+    message: "Wishlist item removed successfully",
+  });
 }
